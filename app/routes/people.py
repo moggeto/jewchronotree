@@ -2,6 +2,8 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
-@router.get('/people')
-def people():
-    return "am israel hai"
+
+# Страница отображения таблицы личностей
+@router.get("/people")
+def read_people():
+    return 'wtf'

@@ -1,14 +1,21 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from .people import Base
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+
+
+from core.config import settings
+
 
 # Инициализация базы данных
-def create_db_engine(database_url='sqlite:///chronology.db'):
-    engine = create_engine(database_url)
-    Base.metadata.create_all(engine)
-    return engine
+class Database:
+    def __init__(self, url: str, echo: bool = False):
+        self.engine = create_async_engine(
+            url=url,
+            echo=echo
+        )
+        self.session_factory = async_sessionmaker(bind=self.engine,
+                                            autoflash=False,
+                                            autocommit=False,
+                                            expire_on_commit=False,
+                                            )
 
-# Создание сессии
-def get_session(engine):
-    Session = sessionmaker(bind=engine)
-    return Session()
+
+db = Database(url=settings.db_url, echo=settings.db_echo)
