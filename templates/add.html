@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Person</title>
+</head>
+<body>
+    <h1>Add New Person</h1>
+    <form action="/add" method="post">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="birth_year">Birth Year:</label>
+        <input type="number" id="birth_year" name="birth_year"><br>
+
+        <label for="death_year">Death Year:</label>
+        <input type="number" id="death_year" name="death_year"><br>
+
+        <label for="tribe">Tribe:</label>
+        <input type="text" id="tribe" name="tribe"><br>
+
+        <label for="father_id">Father ID (if known):</label>
+        <input type="number" id="father_id" name="father_id"><br>
+
+        <button type="submit">Add Person</button>
+    </form>
+</body>
+</html>
