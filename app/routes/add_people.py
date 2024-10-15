@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-from app.crud import create_person
 
 router = APIRouter()
 
