@@ -1,9 +1,12 @@
+from itertools import product
+
 from fastapi import APIRouter, HTTPException, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from . import crud
-from .schemas import Person, Person_create
+from .schemas import Person, PersonCreate, PersonUpdate
 from core.models import db
+from .dependencies import person_by_id
 
 router = APIRouter(tags=['People'])
 
@@ -14,18 +17,25 @@ async def get_people(session: AsyncSession = Depends(db.session_dependency)):
 
 
 @router.post('/add', response_model=Person)
-async def add_people(person_in: Person_create,
+async def add_people(person_in: PersonCreate,
                      session: AsyncSession = Depends(db.session_dependency)):
     return await crud.create_person(session=session, person_in=person_in)
 
 
 @router.get('/{person_id}/', response_model=Person)
-async def get_people(person_id: int,
-                     session: AsyncSession = Depends(db.session_dependency)):
-    person = await crud.get_person(session=session, person_id=person_id)
-    if person is not None:
-        return person
+async def get_people(
+        person: Person = Depends(person_by_id)
+):
+    return person
 
-    raise HTTPException(
-        status_code=status.HTTP_404_NOT_FOUND, detail='not found'
+
+@router.put('/{person_id}/', response_model=Person)
+async def update_person(person: Person = Depends(person_by_id),
+                        person_update = PersonUpdate,
+                        session: AsyncSession = Depends(db.session_dependency),
+):
+    return await crud.update_person(
+        session=session,
+        person=person,
+        person_update=person_update,
     )

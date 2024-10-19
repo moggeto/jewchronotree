@@ -1,25 +1,29 @@
+from itertools import product
+
 from sqlalchemy import select
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from core.models import Person
-from .schemas import Person_create
+from .schemas import PersonCreate, PersonUpdate, PersonUpdatePartial
 
 
 async def get_all_people(session: AsyncSession) -> list[Person]:
-    statement =  select(Person).order_by(Person.id)
+    statement = select(Person).order_by(Person.id)
     result: Result = await session.execute(statement)
     people = result.scalars().all()
     return list(people)
 
+
 async def get_person(session: AsyncSession, person_id: int) -> Person | None:
-    return await session.get(Person, person_id )
+    return await session.get(Person, person_id)
+
 
 # async def create_person(session: AsyncSession, person_in: Person_create) -> Person:
 #     person = Person(**person_in.model_dump())
 #     session.add(person)
 #     await session.commit()
 #     return person
-async def create_person(session: AsyncSession, person_in: Person_create) -> Person:
+async def create_person(session: AsyncSession, person_in: PersonCreate) -> Person:
     if not person_in.name:  # Проверка, что имя заполнено
         raise ValueError("Name is required to create a person")
 
@@ -27,6 +31,26 @@ async def create_person(session: AsyncSession, person_in: Person_create) -> Pers
     session.add(person)
     await session.commit()
     return person
+
+
+async def update_person(
+        session: AsyncSession,
+        person: Person,
+        person_update: PersonUpdate | PersonUpdatePartial,
+        partial: bool = False,
+) -> Person:
+    for name, value in person_update.model_dump(exclude_unset=partial).items():
+        setattr(person, name, value)
+    await person.commit()
+    return person
+
+
+async def delete_person(
+        session: AsyncSession,
+        person: Person,
+) -> None:
+    await session.delete(person)
+    await session.commit()
 
 # from core.models.people import Person
 #
